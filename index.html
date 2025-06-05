@@ -1,9 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>ASCII Grid Pattern</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
       margin: 0;
@@ -12,35 +12,26 @@
       color: black;
       font-family: monospace;
       overflow: hidden;
-      height: 100%;
-      width: 100%;
     }
     canvas {
       display: block;
-      width: 100vw;
-      height: 100vh;
-      background: white;
+      width: 1920px;
+      height: 480px;
     }
   </style>
 </head>
 <body>
-  <canvas id="asciiCanvas"></canvas>
+  <canvas id="asciiCanvas" width="1920" height="480"></canvas>
   <script>
     const canvas = document.getElementById('asciiCanvas');
     const ctx = canvas.getContext('2d');
 
-    const cols = 120;
+    const cols = 120; // fewer cols = bigger symbols
     const rows = 30;
-    let charWidth, charHeight;
+    const charWidth = canvas.width / cols;
+    const charHeight = canvas.height / rows;
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      charWidth = canvas.width / cols;
-      charHeight = canvas.height / rows;
-    }
-
-    const chars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'];
+    const chars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@']; // from light to dark
 
     function pseudoNoise(x, y, t) {
       return Math.sin(x * 0.3 + Math.sin(y * 0.3 + t)) +
@@ -48,19 +39,17 @@
              Math.sin(x * 0.1 + y * 0.1 + t * 0.5);
     }
 
-    function draw(time) {
+    function draw(t) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = 'black';
       ctx.font = `${charHeight * 0.95}px monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const t = time * 0.001;
-
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          const value = pseudoNoise(x, y, t);
-          const normalized = (value + 2) / 4;
+          const value = pseudoNoise(x, y, t * 0.002);
+          const normalized = (value + 2) / 4; // normalize to [0,1]
           const index = Math.floor(normalized * (chars.length - 1));
           const char = chars[index];
 
@@ -74,9 +63,7 @@
       requestAnimationFrame(draw);
     }
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    requestAnimationFrame(draw);
+    draw(0);
   </script>
 </body>
 </html>
