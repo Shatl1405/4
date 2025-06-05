@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ASCII Grid Pattern</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: white;
+      color: black;
+      font-family: monospace;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="asciiCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('asciiCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const cols = 120;
+    const rows = 30;
+    let charWidth, charHeight;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      charWidth = canvas.width / cols;
+      charHeight = canvas.height / rows;
+    }
+
+    const chars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'];
+
+    function pseudoNoise(x, y, t) {
+      return Math.sin(x * 0.3 + Math.sin(y * 0.3 + t)) +
+             Math.cos(y * 0.2 + Math.sin(x * 0.2 + t)) +
+             Math.sin(x * 0.1 + y * 0.1 + t * 0.5);
+    }
+
+    function draw(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'black';
+      ctx.font = `${charHeight * 0.95}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const t = time * 0.001;
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const value = pseudoNoise(x, y, t);
+          const normalized = (value + 2) / 4;
+          const index = Math.floor(normalized * (chars.length - 1));
+          const char = chars[index];
+
+          const px = x * charWidth + charWidth / 2;
+          const py = y * charHeight + charHeight / 2;
+
+          ctx.fillText(char, px, py);
+        }
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
